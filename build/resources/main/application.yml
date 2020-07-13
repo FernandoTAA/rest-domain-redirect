@@ -1,0 +1,3 @@
+server.port: 80
+destination.url: ${destinationUrl:http://domain.com}
+logging.level.com.github.fernandotaa.restdomainredirect: DEBUG

@@ -1,6 +1,6 @@
 version: "3.7"
 services:
-  notification:
+  rest-domain-redirect:
     container_name: rest-domain-redirect
     build:
       context: .
@@ -10,7 +10,7 @@ services:
     ports:
       - 8080:80
     networks:
-      - notification-network
+      - rest-domain-redirect-network
 networks:
-  notification-network:
+  rest-domain-redirect-network:
     driver: bridge

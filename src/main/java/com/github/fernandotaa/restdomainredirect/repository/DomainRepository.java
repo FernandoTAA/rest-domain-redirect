@@ -1,61 +1,35 @@
 package com.github.fernandotaa.restdomainredirect.repository;
 
-import feign.Response;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
+@Repository
+public class DomainRepository {
+    private final RestTemplate restTemplate;
+    private final String url;
 
-@FeignClient(name = "DomainRepository", url = "${destination.url}")
-public interface DomainRepository {
-    @GetMapping(
-            value = "{uri}",
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    Response get(
-            @PathVariable("uri") String uri,
-            @RequestHeader Map<String, String> header,
-            @RequestBody(required = false) byte[] body
-    );
+    public DomainRepository(
+            RestTemplate restTemplate,
+            @Value("${destination.url}") String url
+    ) {
+        this.restTemplate = restTemplate;
+        this.url = url;
+    }
 
-    @PostMapping(
-            value = "{uri}",
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    Response post(
-            @PathVariable("uri") String uri,
-            @RequestHeader Map<String, String> header,
-            @RequestBody(required = false) byte[] body
-    );
-
-    @PutMapping(
-            value = "{uri}",
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    Response put(
-            @PathVariable("uri") String uri,
-            @RequestHeader Map<String, String> header,
-            @RequestBody(required = false) byte[] body
-    );
-
-    @DeleteMapping(
-            value = "{uri}",
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    Response delete(
-            @PathVariable("uri") String uri,
-            @RequestHeader Map<String, String> header,
-            @RequestBody(required = false) byte[] body
-    );
-
-    @PatchMapping(
-            value = "{uri}",
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    Response patch(
-            @PathVariable("uri") String uri,
-            @RequestHeader Map<String, String> header,
-            @RequestBody(required = false) byte[] body
-    );
+    public ResponseEntity<byte[]> call(
+            String method,
+            String uri,
+            MultiValueMap<String, String> headers,
+            byte[] body
+    ) {
+        var route = url + uri;
+        var httpMethod = HttpMethod.resolve(method);
+        var httpEntity = new HttpEntity<byte[]>(body, headers);
+        return restTemplate.exchange(route, httpMethod, httpEntity, byte[].class);
+    }
 }

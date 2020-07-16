@@ -1,0 +1,2 @@
+server.port: 5000
+destination.url: http://domain.com
